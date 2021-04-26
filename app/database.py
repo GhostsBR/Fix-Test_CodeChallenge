@@ -80,13 +80,13 @@ class DataBase:
     def update_data(self, table_to_update: str, data: dict, find: dict) -> bool:
         self.verify_database_requirements(data)
         self.verify_database_requirements(find)
+        if not find:
+            return False
         find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
-        if find == "":
+        data = ", ".join(self.convert_dict_to_sql_string(data.items()))
+        if data == "":
             return False
-        items = ", ".join(self.convert_dict_to_sql_string(data.items()))
-        if items == "":
-            return False
-        sql = f"""UPDATE `{table_to_update}` SET {items} WHERE {find}"""
+        sql = f"""UPDATE `{table_to_update}` SET {data} WHERE {find}"""
         try:
             affected_rows = self.cursor.execute(sql)
             if affected_rows > 0:
@@ -96,9 +96,10 @@ class DataBase:
 
     def get_data(self, table_to_get: str, find: dict) -> list:
         self.verify_database_requirements(find)
-        find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
+        if find:
+            find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
         sql = ""
-        if find == "":
+        if not find:
             sql = f"""SELECT * FROM `{table_to_get}`"""
         else:
             sql = f"""SELECT * FROM `{table_to_get}` WHERE {find}"""
@@ -111,10 +112,10 @@ class DataBase:
     def delete_data(self, table_to_delete: str, find: dict) -> bool:
         self.verify_database_requirements(find)
         sql = ""
-        find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
-        if find == "":
+        if not find:
             return False
         else:
+            find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
             sql = f"""DELETE FROM `{table_to_delete}` WHERE {find}"""
         try:
             self.cursor.execute(sql)
