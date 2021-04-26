@@ -58,8 +58,6 @@ class DataBase:
             raise Exception("Connetion or cursor is not defined!")
         if not self.is_database_selected():
             raise Exception("Database is not selected!")
-        if not isinstance(data, list):
-            raise TypeError("Data is not a list!")
         return True
 
     def insert_data(self, table_to_insert: str, data: list) -> bool:
@@ -98,7 +96,6 @@ class DataBase:
         self.verify_database_requirements(find)
         if find:
             find = " AND ".join(self.convert_dict_to_sql_string(find.items()))
-        sql = ""
         if not find:
             sql = f"""SELECT * FROM `{table_to_get}`"""
         else:
@@ -111,7 +108,6 @@ class DataBase:
 
     def delete_data(self, table_to_delete: str, find: dict) -> bool:
         self.verify_database_requirements(find)
-        sql = ""
         if not find:
             return False
         else:

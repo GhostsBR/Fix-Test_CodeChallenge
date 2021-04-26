@@ -64,15 +64,6 @@ class TestDataBase(TestCase):
 
         mock_is_database_selected.return_value = True
 
-        # ///////////////////////////////////////////////////////////////////////////
-
-        with self.assertRaises(TypeError) as error:
-            DataBase().insert_data("", "")
-
-        self.assertEqual("Data is not a list!", error.exception.args[0])
-        with mock.patch("app.database.DataBase.cursor", create=True):
-            self.assertEqual(DataBase().verify_database_requirements([]), True)
-
     @mock.patch("app.database.DataBase.verify_database_requirements")
     @mock.patch("app.database.DataBase.is_database_selected")
     @mock.patch("app.database.DataBase.conn_and_cursor_exist")
@@ -82,8 +73,8 @@ class TestDataBase(TestCase):
         with mock.patch("app.database.DataBase.cursor", create=True) as mock_cursor:
             mock_cursor.execute.side_effect = [0, 1]
             mock_verify_database_requirements.return_value = True
-            self.assertEqual(DataBase().insert_data("", []), False)
-            self.assertEqual(DataBase().insert_data("", []), True)
+            self.assertFalse(DataBase().insert_data("", []))
+            self.assertTrue(DataBase().insert_data("", []))
 
         self.assertFalse(DataBase().insert_data("", []))
 
@@ -91,13 +82,13 @@ class TestDataBase(TestCase):
     def test_update_data_works(self, mock_verify_database_requirements):
         with mock.patch("app.database.DataBase.cursor", create=True) as mock_cursor:
             mock_verify_database_requirements.return_value = True
-            self.assertEqual(DataBase().update_data("", dict(teste="tested"), dict()), False)
-            self.assertEqual(DataBase().update_data("", dict(teste="tested"), dict(teste="tested")), False)
-            self.assertEqual(DataBase().update_data("", dict(teste=1), dict(teste=1)), False)
-            self.assertEqual(DataBase().update_data("", dict(teste=1.0), dict(teste=1.0)), False)
-            self.assertEqual(DataBase().update_data("", dict(), dict(teste=1.0)), False)
+            self.assertFalse(DataBase().update_data("", dict(teste="tested"), dict()))
+            self.assertFalse(DataBase().update_data("", dict(teste="tested"), dict(teste="tested")))
+            self.assertFalse(DataBase().update_data("", dict(teste=1), dict(teste=1)))
+            self.assertFalse(DataBase().update_data("", dict(teste=1.0), dict(teste=1.0)))
+            self.assertFalse(DataBase().update_data("", dict(), dict(teste=1.0)))
             mock_cursor.execute.return_value = True
-            self.assertEqual(DataBase().update_data("", dict(teste="tested"), dict(teste=1.0)), True)
+            self.assertTrue(DataBase().update_data("", dict(teste="tested"), dict(teste=1.0)))
 
 
     @mock.patch("app.database.DataBase.verify_database_requirements")
@@ -117,6 +108,6 @@ class TestDataBase(TestCase):
     def test_delete_data_works(self, mock_verify_database_requirements):
         with mock.patch("app.database.DataBase.cursor", create=True) as mock_cursor:
             mock_verify_database_requirements.return_value = True
-            self.assertEqual(DataBase().delete_data("", dict()), False)
-            self.assertEqual(DataBase().delete_data("", dict(teste="tested")), True)
-        self.assertEqual(DataBase().delete_data("", dict(teste="tested")), False)
+            self.assertFalse(DataBase().delete_data("", dict()))
+            self.assertTrue(DataBase().delete_data("", dict(teste="tested")))
+        self.assertFalse(DataBase().delete_data("", dict(teste="tested")))
